@@ -1,0 +1,13 @@
+@charset "UTF-8";
+#grid{
+  border: #000 1px solid;
+}
+#grid tr{
+  border: #000 1px solid;
+}
+#grid td{
+  border: #000 1px solid;
+}
+.griddata{
+  padding: 20px;
+}
