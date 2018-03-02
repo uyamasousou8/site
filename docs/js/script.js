@@ -28,7 +28,7 @@ $(function(){
   $("td").click(function()
   {
     var target = "target" + $(this).parent().index() + "-" + $(this).index();
-    var index = $(this).parent().index() + $(this).index() * $(this).parent().length;
+    var index = $(this).index() + $(this).parent().index() * $(this).parent().children().length;
     //alert(target);
     $(this).addClass(target);
     //NULLを返したらクラスを生成する。
@@ -36,6 +36,7 @@ $(function(){
       tableclass[index] = new TableClass();
       tableclass[index].setColor(target);
     }else{
+      //alert($(this).parent().children().length);
       tableclass[index].addClick();
       tableclass[index].setColor(target);
     }
