@@ -1,4 +1,10 @@
 @charset "UTF-8";
+h1{
+  font-size: 250%;
+}
+nav{
+  margin: 3em 1em;
+}
 #grid{
   border: #000 1px solid;
 }

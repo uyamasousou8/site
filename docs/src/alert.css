@@ -1,0 +1,47 @@
+@charset "UTF-8";
+body{
+  background: #a5a;
+}
+header{
+  text-align: center;
+  padding-top: 2em;
+}
+h1{
+  font-size: 250%;
+}
+main{
+  /*background: #fff;*/
+  max-width: 1000px;
+  width: 100%;
+  margin :2em auto;
+  display: block;
+  text-align: center;
+}
+main button{
+  border: none;
+  padding: 1em 2em;
+  background: #f99;
+  outline: none;
+}
+#bg{
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0,0,0,.4);
+}
+#alertbox{
+  margin: 200px auto 0;
+  text-align: center;
+  padding-top:25px;
+  width:300px;
+  height:85px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 2px 2px rgba(0,0,0,.3);
+}
+#alertbox p{
+  font-size: 130%;
+  padding: 0.3em;
+}
