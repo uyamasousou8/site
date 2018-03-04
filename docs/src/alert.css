@@ -30,6 +30,11 @@ main button{
   height: 100%;
   width: 100%;
   background: rgba(0,0,0,.4);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+#bg.open{
+  opacity: 1;
 }
 #alertbox{
   margin: 200px auto 0;
@@ -41,6 +46,7 @@ main button{
   border-radius: 3px;
   box-shadow: 2px 2px rgba(0,0,0,.3);
 }
+
 #alertbox p{
   font-size: 130%;
   padding: 0.3em;
