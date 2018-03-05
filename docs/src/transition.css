@@ -1,0 +1,26 @@
+@charset "UTF-8";
+#test{
+  padding: 2em;
+  background: #00f;
+  transition: background 300ms;
+}
+#test:hover {
+  background: #f00;
+}
+#test2{
+  padding: 2em;
+  background: #00f;
+  transition: background 300ms;
+}
+#test2.colors{
+  background: #f0f;
+}
+#test3{
+  max-height: 100px;
+  height : 0px;
+  overflow: hidden;
+  transition: display 3000ms,height 300ms;
+}
+#test3.heights{
+  height : 100px;
+}

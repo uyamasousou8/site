@@ -1,0 +1,50 @@
+@charset "UTF-8";
+body{
+  background: #a33;
+}
+h1{
+  padding:15px 10px;
+  color: #fff;
+  font-size : 250%;
+}
+button{
+  color: #fff;
+  position: absolute;
+  top:17px;
+  right: 25px;
+  font-size: 250%;
+  background-color: transparent;
+  border: none;
+  cursor:pointer;
+}
+#menu.menuhide{
+  overflow: hidden;
+  height: 0px;
+}
+#menu{
+  height: 230.4px;
+  transition: height 3000ms;
+}
+#menu li{
+  line-height: 57.6px;
+  font-size:120%;
+  background: #922;
+  color:#fff;
+  height : 57.6px;
+  transition: height 3000ms;
+}
+#menu li.animetion{
+  overflow: hidden;
+  height:0px;
+}
+ul li a{
+  text-decoration: none;
+  color: white;
+}
+main{
+  background: #fff;
+  font-size : 80%;
+  color: #000;
+  padding:2em;
+  line-height: 1.2em;
+}
