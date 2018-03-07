@@ -85,19 +85,29 @@ class Player{
   move(){
     if(pressKeys[0])
     {
-      this.PlayerX-=this.PlayerSpeedX;
+      if(this.PlayerX >= -5){
+        this.PlayerX-=this.PlayerSpeedX;
+      }
     }
     if(pressKeys[1])
     {
-      this.PlayerY-=this.PlayerSpeedY;
+      if(this.PlayerY >= -5){
+        this.PlayerY-=this.PlayerSpeedY;
+      }
     }
     if(pressKeys[2])
     {
-      this.PlayerX+=this.PlayerSpeedX;
+      if(this.PlayerX < ctx.width + 5)
+      {
+        this.PlayerX+=this.PlayerSpeedX;
+      }
     }
     if(pressKeys[3])
     {
-      this.PlayerY+=this.PlayerSpeedY;
+      if(this.PlayerY < ctx.height + 5)
+      {
+        this.PlayerY+=this.PlayerSpeedY;
+      }
     }
     if(pressKeys[4] && gametime%6==0)
     {
