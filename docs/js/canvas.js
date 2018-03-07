@@ -6,6 +6,7 @@ var y = 0;
 var gametime = 0;
 var pressKeys =[];
 var pbullet = [];
+var enemy = [];
 class PBullet{
   constructor(x,y){
     this.sizeX = 6;
@@ -32,6 +33,38 @@ class PBullet{
   }
   getY(){
     return this.PBulletY;
+  }
+}
+class Enemy{
+  constructor(x,y){
+    this.radius = 10;
+    this.EnemyX = x;
+    this.EnemyY = y;
+    var Speedrandom = -1;
+    if(Math.floor(Math.random()*201)%2 == 0)
+    {
+      Speedrandom = 1;
+    }
+    this.EnemySpeedX = Speedrandom * Math.floor(Math.random()*11);
+    this.EnemySpeedY = 3 + Math.floor(Math.random()*5);
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.fillStyle = "#00FF00";
+    ctx.arc(this.EnemyX,this.EnemyY,this.radius,0,Math.PI*2,false);
+    ctx.fill();
+    ctx.closePath();
+  }
+  move()
+  {
+    this.EnemyX += this.EnemySpeedX;
+    this.EnemyY += this.EnemySpeedY;
+  }
+  getX(){
+    return this.EnemyX;
+  }
+  getY(){
+    return this.EnemyY;
   }
 }
 class Player{
@@ -66,7 +99,7 @@ class Player{
     {
       this.PlayerY+=this.PlayerSpeedY;
     }
-    if(pressKeys[4] && gametime%4==0)
+    if(pressKeys[4] && gametime%6==0)
     {
       for(var i=0;i<256;i++){
         if(pbullet[i] == null){
@@ -93,17 +126,43 @@ var run = function()
 var update = function(){
   //内部処理
   gametime++;
+  //敵の生成
+  if(gametime%10 === 1){
+    for(var i=0;i<256;i++){
+      if(enemy[i] == null){
+        enemy[i] = new Enemy(Math.floor(Math.random()*ctx.width),0 + 5);
+        break;
+      }
+    }
+  }
+
   ctx.clearRect(0,0,ctx.width,ctx.height);
   player.move();
   for(var i = 0;i<256;i++){
+    //そもそも弾が存在しなければ飛ばす
     if(pbullet[i] == null){
       continue;
     }
     else {
       pbullet[i].move();
+      //画面外に弾が出たら消去する。
       if(pbullet[i].getX()<0 || pbullet[i].getX()>ctx.width || pbullet[i].getY() < 0 || pbullet[i].getY() > ctx.heights)
       {
         pbullet[i] = null;
+      }
+    }
+  }
+  for(var i = 0;i<256;i++){
+    //そもそもエネミーが存在していなければ飛ばす
+    if(enemy[i] == null){
+      continue;
+    }
+    else {
+      enemy[i].move();
+      //敵が画面外に出たら消去する
+      if(enemy[i].getX()<0 || enemy[i].getX()>ctx.width || enemy[i].getY() < 0 || enemy[i].getY() > ctx.heights)
+      {
+        enemy[i] = null;
       }
     }
   }
@@ -116,6 +175,14 @@ var draw = function(){
     }
     else {
       pbullet[i].draw();
+    }
+  }
+  for(var i = 0;i<256;i++){
+    if(enemy[i] == null){
+      continue;
+    }
+    else {
+      enemy[i].draw();
     }
   }
 };
