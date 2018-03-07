@@ -3,7 +3,82 @@ var canvas = null;
 var ctx = null;
 var x = 0;
 var y = 0;
+var gametime = 0;
 var pressKeys =[];
+var pbullet = [];
+class PBullet{
+  constructor(x,y){
+    this.sizeX = 6;
+    this.sizeY = 8;
+    this.PBulletX = x - 6/2;
+    this.PBulletY = y;
+    this.PBulletSpeedX = 0;
+    this.PBulletSpeedY = -6;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.fillStyle = "#FF00FF";
+    ctx.fillRect(this.PBulletX,this.PBulletY,this.sizeX,this.sizeY);
+    ctx.fill();
+    ctx.closePath();
+  }
+  move()
+  {
+    this.PBulletX += this.PBulletSpeedX;
+    this.PBulletY += this.PBulletSpeedY;
+  }
+  getX(){
+    return this.PBulletX;
+  }
+  getY(){
+    return this.PBulletY;
+  }
+}
+class Player{
+  constructor(x,y){
+    this.PlayerX = x;
+    this.PlayerY = y;
+    this.PlayerSpeedX = 3;
+    this.PlayerSpeedY = 3;
+    this.radius = 10;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.PlayerX,this.PlayerY,this.radius,0,Math.PI*2,false);
+    ctx.fillStyle = "#FF0000";
+    ctx.fill();
+    ctx.closePath();
+  }
+  move(){
+    if(pressKeys[0])
+    {
+      this.PlayerX-=this.PlayerSpeedX;
+    }
+    if(pressKeys[1])
+    {
+      this.PlayerY-=this.PlayerSpeedY;
+    }
+    if(pressKeys[2])
+    {
+      this.PlayerX+=this.PlayerSpeedX;
+    }
+    if(pressKeys[3])
+    {
+      this.PlayerY+=this.PlayerSpeedY;
+    }
+    if(pressKeys[4] && gametime%4==0)
+    {
+      for(var i=0;i<256;i++){
+        if(pbullet[i] == null){
+          pbullet[i] = new PBullet(this.PlayerX,this.PlayerY);
+          break;
+        }
+      }
+    }
+  }
+
+}
+var player = new Player(160,450);
 var run = function()
 {
   var _run = function()
@@ -17,35 +92,33 @@ var run = function()
 };
 var update = function(){
   //内部処理
+  gametime++;
   ctx.clearRect(0,0,ctx.width,ctx.height);
-  movePlayer();
+  player.move();
+  for(var i = 0;i<256;i++){
+    if(pbullet[i] == null){
+      continue;
+    }
+    else {
+      pbullet[i].move();
+      if(pbullet[i].getX()<0 || pbullet[i].getX()>ctx.width || pbullet[i].getY() < 0 || pbullet[i].getY() > ctx.heights)
+      {
+        pbullet[i] = null;
+      }
+    }
+  }
 };
 var draw = function(){
-  ctx.beginPath();
-  ctx.rect(x,y,50,50);
-  ctx.fillStyle = "#FF0000";
-  ctx.fill();
-  ctx.closePath();
+  player.draw();
+  for(var i = 0;i<256;i++){
+    if(pbullet[i] == null){
+      continue;
+    }
+    else {
+      pbullet[i].draw();
+    }
+  }
 };
-var movePlayer = function()
-{
-  if(pressKeys[0])
-  {
-    x--;
-  }
-  if(pressKeys[1])
-  {
-    y--;
-  }
-  if(pressKeys[2])
-  {
-    x++;
-  }
-  if(pressKeys[3])
-  {
-    y++;
-  }
-}
 var keyDown = function(e){
   var ck = e.keyCode;
 
@@ -65,6 +138,10 @@ var keyDown = function(e){
     //y++;
     pressKeys[3] = true;
   } //下キー
+  if(ck === 32)
+  {
+    pressKeys[4] = true;
+  }//スペースキー
 };
 var keyUp = function(e){
   var ck = e.keyCode;
@@ -85,12 +162,17 @@ var keyUp = function(e){
     //y++;
     pressKeys[3] = false;
   } //下キー
+  if(ck === 32)
+  {
+    pressKeys[4] = false;
+  }//スペースキー
 };
 var Init = function(){
   canvas = document.getElementById("shooting");
   ctx = canvas.getContext("2d");
   ctx.width = 320;
   ctx.height = 480;
+
 
   //キー入力のイベントを仕込んでおく。
   document.addEventListener('keydown',keyDown,false);

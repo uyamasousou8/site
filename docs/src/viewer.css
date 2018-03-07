@@ -1,0 +1,24 @@
+@charset "UTF-8";
+body{
+  background: #0a0;
+}
+h1{
+  font-size: 250%;
+  font-weight: bold;
+  text-align: center;
+}
+header{
+  margin: 40px auto;
+}
+figure{
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+}
+ul{
+  margin:10px;
+  text-align: center;
+}
+ul li{
+  display: inline-block;
+}

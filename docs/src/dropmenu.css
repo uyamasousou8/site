@@ -1,0 +1,50 @@
+@charset "UTF-8";
+body{
+  background: #0a0;
+  -webkit-font-smoothing:antialiased;
+}
+h1{
+  font-size: 250%;
+  font-weight: bold;
+  text-align: center;
+}
+header{
+  margin: 40px auto;
+}
+main{
+  margin: auto;
+  background: white;
+  width:1000px;
+
+}
+ul{
+  text-align: center;
+}
+li{
+  float:left;
+	width:250px;
+	text-align:center;
+	list-style-type:none;
+	font-weight:bold;
+}
+li li{
+	float:none;
+	border-top:1px solid #7F9492;
+}
+ul li a{
+  display:block;
+	padding:20px 0;
+	color:#FDC825;
+	background:#3F5250;
+	border-right:1px solid #526563;
+	text-decoration:none;
+}
+li a:hover{
+	color:#FFF;
+	background:#394C4A;
+}
+ul ul{
+  display: block;
+  position:absolute;
+  width:250px;
+}
