@@ -3,18 +3,61 @@ var canvas = null;
 var ctx = null;
 var x = 0;
 var y = 0;
+var gamescene = 1;
 var gametime = 0;
 var pressKeys =[];
 var pbullet = [];
 var enemy = [];
+var effect = [];
+var score = 0;
+class Effect {
+  constructor(x,y) {
+    this.radius = Math.floor(Math.random()*10);
+    this.EffectX = x;
+    this.EffectY = y;
+    var SpeedrandomX = -1;
+    var SpeedrandomY = -1;
+    if(Math.floor(Math.random()*201)%2 == 0)
+    {
+      SpeedrandomX = 1;
+    }
+    this.EffectSpeedX = SpeedrandomX * Math.floor(Math.random()*11);
+    if(Math.floor(Math.random()*201)%2 == 0)
+    {
+      SpeedrandomY = 1;
+    }
+    this.EffectSpeedY = SpeedrandomY + Math.floor(Math.random()*11);
+    this.flag = 1;
+    this.lifetime = Math.floor(Math.random()*10);
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.fillStyle = "#fff0ff";
+    ctx.arc(this.EffectX,this.EffectY,this.radius,0,Math.PI*2,false);
+    ctx.fill();
+    ctx.closePath();
+  }
+  move()
+  {
+    this.EffectX += this.EffectSpeedX;
+    this.EffectY += this.EffectSpeedY;
+    this.lifetime--;
+  }
+  getlife()
+  {
+    return this.lifetime;
+  }
+}
 class PBullet{
   constructor(x,y){
-    this.sizeX = 6;
+    this.sizeX = 8;
     this.sizeY = 8;
     this.PBulletX = x - 6/2;
     this.PBulletY = y;
     this.PBulletSpeedX = 0;
     this.PBulletSpeedY = -6;
+    this.radius = 8;
+    this.flag = 1;
   }
   draw(){
     ctx.beginPath();
@@ -34,6 +77,18 @@ class PBullet{
   getY(){
     return this.PBulletY;
   }
+  getradius()
+  {
+    return this.radius;
+  }
+  setflag(Flag)
+  {
+    this.flag = Flag;
+  }
+  getflag()
+  {
+    return this.flag;
+  }
 }
 class Enemy{
   constructor(x,y){
@@ -47,6 +102,7 @@ class Enemy{
     }
     this.EnemySpeedX = Speedrandom * Math.floor(Math.random()*11);
     this.EnemySpeedY = 3 + Math.floor(Math.random()*5);
+    this.flag = 1;
   }
   draw(){
     ctx.beginPath();
@@ -66,6 +122,18 @@ class Enemy{
   getY(){
     return this.EnemyY;
   }
+  getradius()
+  {
+    return this.radius;
+  }
+  setflag(Flag)
+  {
+    this.flag = Flag;
+  }
+  getflag()
+  {
+    return this.flag;
+  }
 }
 class Player{
   constructor(x,y){
@@ -74,6 +142,7 @@ class Player{
     this.PlayerSpeedX = 3;
     this.PlayerSpeedY = 3;
     this.radius = 10;
+    this.flag = 1;
   }
   draw(){
     ctx.beginPath();
@@ -119,6 +188,24 @@ class Player{
       }
     }
   }
+  getX(){
+    return this.PlayerX;
+  }
+  getY(){
+    return this.PlayerY;
+  }
+  getradius()
+  {
+    return this.radius;
+  }
+  setflag(Flag)
+  {
+    this.flag = Flag;
+  }
+  getflag()
+  {
+    return this.flag;
+  }
 
 }
 var player = new Player(160,450);
@@ -126,8 +213,19 @@ var run = function()
 {
   var _run = function()
   {
-    update();
-    draw();
+
+    if(gamescene == 1){
+      update();
+      draw();
+    }
+    else {
+      ctx.beginPath();
+      ctx.font = "28px serif"
+      ctx.fillStyle= "#fff";
+      ctx.fillText("GameOver",104,240);
+      ctx.fill();
+      ctx.closePath();
+    }
 
     setTimeout(_run,1000.0/fps);
   };
@@ -156,8 +254,45 @@ var update = function(){
     else {
       pbullet[i].move();
       //画面外に弾が出たら消去する。
-      if(pbullet[i].getX()<0 || pbullet[i].getX()>ctx.width || pbullet[i].getY() < 0 || pbullet[i].getY() > ctx.heights)
+      if(pbullet[i].getX()<0 || pbullet[i].getX()>ctx.width || pbullet[i].getY() < 0 || pbullet[i].getY() > ctx.height)
       {
+        pbullet[i] = null;
+        continue;
+      }
+      //衝突判定
+      for(var j=0;j<256;j++)
+      {
+        //敵が存在していなければ飛ばす
+        if(enemy[j] == null){
+          continue;
+        }
+        //敵が存在したら衝突判定を行う
+        var distance = (pbullet[i].getX() - enemy[j].getX())*(pbullet[i].getX() - enemy[j].getX()) + (pbullet[i].getY() - enemy[j].getY())*(pbullet[i].getY() - enemy[j].getY());
+        var radius = (pbullet[i].getradius() + enemy[j].getradius())*(pbullet[i].getradius() + enemy[j].getradius());
+        if(distance < radius){
+          //中心点同士の距離が半径の合計の二乗より小さければ衝突している。
+          //即座に消去する。
+          pbullet[i].setflag(0);
+          //パーティクルを作成する。
+          var k = 0;
+          while(k<10){
+            for(var t = 0;t<512;t++){
+              if(effect[t]!=null){
+                continue;
+              }
+              else if(effect[t]==null){
+                effect[t] = new Effect(enemy[j].getX(),enemy[j].getY());
+                break;
+              }
+            }
+            k++;
+          }
+          score += 100;
+          //敵の消去フラグ
+          enemy[j].setflag(0);
+        }
+      }
+      if(pbullet[i].getflag() == 0){
         pbullet[i] = null;
       }
     }
@@ -168,16 +303,42 @@ var update = function(){
       continue;
     }
     else {
+      if(enemy[i].getflag() == 0)
+      {
+        enemy[i] = null;
+        continue;
+      }
       enemy[i].move();
       //敵が画面外に出たら消去する
-      if(enemy[i].getX()<0 || enemy[i].getX()>ctx.width || enemy[i].getY() < 0 || enemy[i].getY() > ctx.heights)
+      if(enemy[i].getX()<0 || enemy[i].getX()>ctx.width || enemy[i].getY() < 0 || enemy[i].getY() > ctx.height)
       {
         enemy[i] = null;
       }
     }
   }
+  for(var i = 0;i<512;i++){
+    //そもそもパーティクルが存在していなければ飛ばす
+    if(effect[i] == null){
+      continue;
+    }
+    else {
+      effect[i].move();
+      //敵が画面外に出たら消去する
+      if(effect[i].getlife() < 0){
+        effect[i] = null;
+      }
+    }
+  }
 };
 var draw = function(){
+  //スコアの表示
+  ctx.beginPath();
+  ctx.font = "14px serif"
+  ctx.fillStyle= "#fff";
+  ctx.fillText("Score:"+score,0,10);
+  ctx.fill();
+  ctx.closePath();
+
   player.draw();
   for(var i = 0;i<256;i++){
     if(pbullet[i] == null){
@@ -193,6 +354,14 @@ var draw = function(){
     }
     else {
       enemy[i].draw();
+    }
+  }
+  for(var i = 0;i<256;i++){
+    if(effect[i] == null){
+      continue;
+    }
+    else {
+      effect[i].draw();
     }
   }
 };
