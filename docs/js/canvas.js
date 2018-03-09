@@ -3,10 +3,11 @@ var canvas = null;
 var ctx = null;
 var x = 0;
 var y = 0;
-var gamescene = 1;
+var gamescene = 0;
 var gametime = 0;
 var pressKeys =[];
 var pbullet = [];
+var ebullet = [];
 var enemy = [];
 var effect = [];
 var score = 0;
@@ -90,37 +91,38 @@ class PBullet{
     return this.flag;
   }
 }
-class Enemy{
-  constructor(x,y){
-    this.radius = 10;
-    this.EnemyX = x;
-    this.EnemyY = y;
-    var Speedrandom = -1;
-    if(Math.floor(Math.random()*201)%2 == 0)
-    {
-      Speedrandom = 1;
-    }
-    this.EnemySpeedX = Speedrandom * Math.floor(Math.random()*11);
-    this.EnemySpeedY = 3 + Math.floor(Math.random()*5);
+class EBullet{
+  constructor(x,y,px,py){
+
+    this.EBulletX = x;
+    this.EBulletY = y;
+    //角度を考える。
+    var sbx,sby,sb;
+    sbx = px - x;
+    sby = py - y;
+    sb = Math.sqrt(sbx*sbx + sby*sby);
+    this.EBulletSpeedX = sbx / sb * 8;
+    this.EBulletSpeedY = sby / sb * 8;
+    this.radius = 4;
     this.flag = 1;
   }
   draw(){
     ctx.beginPath();
-    ctx.fillStyle = "#00FF00";
-    ctx.arc(this.EnemyX,this.EnemyY,this.radius,0,Math.PI*2,false);
+    ctx.fillStyle = "#0ff0ff";
+    ctx.arc(this.EBulletX,this.EBulletY,this.radius,0,Math.PI*2,false);
     ctx.fill();
     ctx.closePath();
   }
   move()
   {
-    this.EnemyX += this.EnemySpeedX;
-    this.EnemyY += this.EnemySpeedY;
+    this.EBulletX += this.EBulletSpeedX;
+    this.EBulletY += this.EBulletSpeedY;
   }
   getX(){
-    return this.EnemyX;
+    return this.EBulletX;
   }
   getY(){
-    return this.EnemyY;
+    return this.EBulletY;
   }
   getradius()
   {
@@ -139,8 +141,8 @@ class Player{
   constructor(x,y){
     this.PlayerX = x;
     this.PlayerY = y;
-    this.PlayerSpeedX = 3;
-    this.PlayerSpeedY = 3;
+    this.PlayerSpeedX = 6;
+    this.PlayerSpeedY = 6;
     this.radius = 10;
     this.flag = 1;
   }
@@ -209,6 +211,62 @@ class Player{
 
 }
 var player = new Player(160,450);
+class Enemy{
+  constructor(x,y){
+    this.radius = 10;
+    this.EnemyX = x;
+    this.EnemyY = y;
+    var Speedrandom = -1;
+    if(Math.floor(Math.random()*201)%2 == 0)
+    {
+      Speedrandom = 1;
+    }
+    this.EnemySpeedX = Speedrandom * Math.floor(Math.random()*11);
+    this.EnemySpeedY = 3 + Math.floor(Math.random()*5);
+    this.flag = 1;
+    this.gettime = 0;
+
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.fillStyle = "#00FF00";
+    ctx.arc(this.EnemyX,this.EnemyY,this.radius,0,Math.PI*2,false);
+    ctx.fill();
+    ctx.closePath();
+  }
+  move()
+  {
+    this.EnemyX += this.EnemySpeedX;
+    this.EnemyY += this.EnemySpeedY;
+    this.gettime++;
+    if(this.gettime%40==10){
+      for(var i = 0;i < 256;i++){
+        if(ebullet[i] == null){
+          ebullet[i] = new EBullet(this.EnemyX,this.EnemyY,player.getX(),player.getY());
+          break;
+        }
+      }
+    }
+  }
+  getX(){
+    return this.EnemyX;
+  }
+  getY(){
+    return this.EnemyY;
+  }
+  getradius()
+  {
+    return this.radius;
+  }
+  setflag(Flag)
+  {
+    this.flag = Flag;
+  }
+  getflag()
+  {
+    return this.flag;
+  }
+}
 var run = function()
 {
   var _run = function()
@@ -309,11 +367,38 @@ var update = function(){
         continue;
       }
       enemy[i].move();
+      //プレイヤーとの衝突判定
+      var distance = (player.getX() - enemy[i].getX())*(player.getX() - enemy[i].getX()) + (player.getY() - enemy[i].getY())*(player.getY() - enemy[i].getY());
+      var radius = (player.getradius() + enemy[i].getradius())*(player.getradius() + enemy[i].getradius());
+      if(distance < radius){
+        //衝突していたらゲームオーバー
+        gamescene = 2;
+      }
       //敵が画面外に出たら消去する
       if(enemy[i].getX()<0 || enemy[i].getX()>ctx.width || enemy[i].getY() < 0 || enemy[i].getY() > ctx.height)
       {
         enemy[i] = null;
       }
+    }
+  }
+  for(var i = 0;i<256;i++){
+    //そもそも弾が存在しなければ飛ばす
+    if(ebullet[i] == null){
+      continue;
+    }
+    ebullet[i].move();
+    //画面外に弾が出たら消去する。
+    if(ebullet[i].getX()<0 || ebullet[i].getX()>ctx.width || ebullet[i].getY() < 0 || ebullet[i].getY() > ctx.height)
+    {
+      ebullet[i] = null;
+      continue;
+    }
+    //衝突判定
+    var distance = (player.getX() - ebullet[i].getX())*(player.getX() - ebullet[i].getX()) + (player.getY() - ebullet[i].getY())*(player.getY() - ebullet[i].getY());
+    var radius = (player.getradius() + ebullet[i].getradius())*(player.getradius() + ebullet[i].getradius());
+    if(distance < radius){
+      //衝突していたらゲームオーバー
+      gamescene = 2;
     }
   }
   for(var i = 0;i<512;i++){
@@ -346,6 +431,14 @@ var draw = function(){
     }
     else {
       pbullet[i].draw();
+    }
+  }
+  for(var i = 0;i<256;i++){
+    if(ebullet[i] == null){
+      continue;
+    }
+    else {
+      ebullet[i].draw();
     }
   }
   for(var i = 0;i<256;i++){
@@ -418,6 +511,7 @@ var Init = function(){
   ctx = canvas.getContext("2d");
   ctx.width = 320;
   ctx.height = 480;
+  gamescene = 1;
 
 
   //キー入力のイベントを仕込んでおく。
@@ -427,6 +521,14 @@ var Init = function(){
 
 document.addEventListener('DOMContentLoaded',function(){
 //DOMが読み込み終わったら初期化
-  Init();
-  run();
+
+  //ゲームスタート領域をクリックしたらスタート
+  var gamestart = document.getElementById("GameStart");
+  var shooting = document.getElementById("shooting");
+  gamestart.addEventListener('click',function(){
+    gamestart.style.display = "none";
+    shooting.style.display = "block";
+    Init();
+    run();
+  });
 });

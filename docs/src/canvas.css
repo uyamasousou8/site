@@ -17,11 +17,23 @@ main{
   width : 100%;
   overflow: hidden;
 }
-canvas{
+#GameStart{
   background: #000;
+  color:#fff;
   display: block;
+  text-align: center;
+  line-height: 480px;
+  width: 320px;
+  height: 480px;
+  margin: auto;
+  overflow: hidden;
+}
+canvas{
+  display: none;
+  background: #000;
   height: 100%;
   margin: auto;
+  overflow: hidden;
 }
 footer{
   text-align: center;
